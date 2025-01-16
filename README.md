@@ -9,6 +9,12 @@ The environment is, for example, in a directory called <code>env</code>. To crea
 <code>
 <pre>
     python3 -m venv ./venv
+    
+    source venv/bin/activate  # Activate the environment
+
+    sudo apt-get install pipx         # Needed by poetry
+    pipx install poetry               # Poetry
+    pip  install -r requirements.txt  # Installs the packages listed in requirements.txt
 </pre>
 </code>
 
