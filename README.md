@@ -9,7 +9,7 @@ The environment is, for example, in a directory called <code>env</code>. To crea
 <code>
 <pre>
     python3 -m venv ./venv
-    
+
     source venv/bin/activate  # Activate the environment
 
     sudo apt-get install pipx         # Needed by poetry
@@ -24,19 +24,20 @@ Activate the environment with the command:
 
 <code>
 <pre>
-    cd to the root directory of the repo
-    export REPO_ROOT=$(pwd)
+  # cd to the root directory of the towards_ai_course repo
+  export REPO_ROOT=$(pwd)
 
-    source venv/bin/activate
-    
-    # Loads the keys to the API(s).
-    source ${REPO_ROOT}/api_keys/api_keys.sh
+  source venv/bin/activate
 
-    export PYTHONPATH=${PYTHONPATH}:${HOME}/repo/video_processing/src_py/lib
+  # Loads the keys to the API(s).
+  source ${REPO_ROOT}/api_keys/api_keys.sh
+  echo "OPENAI_API_KEY:${OPENAI_API_KEY}"
 
-    # Langchain POC Notebooks
-    cd ${REPO_ROOT}/src_notebooks/nb_langchain
-    jupyter notebook
+  export PYTHONPATH=${PYTHONPATH}:${REPO_ROOT}/src_py/lib
+
+  # Langchain POC Notebooks
+  cd ${REPO_ROOT}/src_notebooks/nb_langchain
+  jupyter notebook
 </pre>
 </code>
 
