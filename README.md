@@ -1,5 +1,14 @@
 # Towards AI Online course "" #
+<p>
+This repository contains the code developed while attending the online course: 
+<a href="https://academy.towardsai.net/courses/beginner-to-advanced-llm-dev" target="_blank">From Beginner to Advanced LLM Developer</a>. 
+</p>
 
+Directory tree:
+<ul>
+<li><a href="src_lessons" target="_blank">src_lessons</a>: notebooks and Python script related to the lessons. </li>
+<li><a href="src_py" target="_blank">src_py</a>: Python libraries used by multiple scripts and notebooks. </li>
+</ul>
 
 ## Installation of the required packages
 
@@ -44,6 +53,6 @@ Activate the environment with the command:
 
 # Links
 <ul>
-  <li> <a target="_blank" href=""></a> </li>
+  <li> <a target="_blank" href="https://github.com/towardsai/ai-tutor-rag-system">Towards AI gitHub: AI Tutor RAG system</a> </li>
   <li> <a target="_blank" href=""></a> </li>
 </ul>
