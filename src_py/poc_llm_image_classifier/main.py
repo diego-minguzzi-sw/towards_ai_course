@@ -13,7 +13,16 @@ class ImageApp:
 
         # Define layout: top area for image, bottom area for buttons, result area, and text area
         self.image_label = tk.Label(self.root, bg="white")
-        self.image_label.grid(row=0, column=0, columnspan=4, sticky="nsew")
+        self.image_label.grid(row=0, column=0, columnspan=2, sticky="nsew")
+
+        self.good_image = Image.open("good.jpg")
+        self.good_image_label = tk.Label(self.root, bg="white")
+        self.good_image_label.grid(row=0, column=2, columnspan=2, sticky="nsew")
+        self.good_image_tk = ImageTk.PhotoImage(self.good_image)
+
+        self.good_image_label.config(image=self.good_image_tk)
+        self.good_image_label.image = self.good_image_tk
+
 
         # Buttons
         self.open_button = tk.Button(self.root, text="Open", command=self.open_image)
@@ -50,12 +59,29 @@ class ImageApp:
 
     def on_resize(self, event):
         # This method will be triggered when the window is resized
-        # We can adjust the image or layout if needed
+        # We can adjust the image size to fit within the window, keeping the aspect ratio
+
         if self.image_tk:
-            self.display_image()  # Call display_image to re-adjust the image if needed
-        # Optionally, you can add any additional resizing behavior for other widgets here.
-        self.root.grid_rowconfigure(0, weight=1)  # Ensure the image area takes up space
-        self.root.grid_propagate(True)
+            # Get current dimensions of the window (excluding borders and padding)
+            width = event.width // 2
+            height = event.height
+
+            # Maintain aspect ratio of the image
+            if self.image:
+                img_width, img_height = self.image.size
+                aspect_ratio = img_width / img_height
+
+                # Determine the new width and height for the image based on aspect ratio
+                if width / height > aspect_ratio:
+                    new_width = int(height * aspect_ratio)
+                    new_height = height
+                else:
+                    new_width = width
+                    new_height = int(width / aspect_ratio)
+
+                # Resize the image to the new dimensions
+                resized_image = self.image.resize((new_width, new_height))
+                self.image_tk = ImageTk.PhotoImage(resized_image)
 
 
     def load_last_directory(self):
@@ -120,3 +146,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+"""
+    def on_resize(self, event):
+        # This method will be triggered when the window is resized
+        # We can adjust the image or layout if needed
+        if self.image_tk:
+            self.display_image()  # Call display_image to re-adjust the image if needed
+        # Optionally, you can add any additional resizing behavior for other widgets here.
+        self.root.grid_rowconfigure(0, weight=1)  # Ensure the image area takes up space
+        self.root.grid_propagate(True)
+"""
