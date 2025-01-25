@@ -1,10 +1,17 @@
-import tkinter as tk
+"""
+https://python.langchain.com/docs/how_to/multimodal_prompts/
+"""
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
+import tkinter as tk
 import os
 
+# --------------------------------------------------------------------------------------------------
 class ImageApp:
+
+    # ----------------------------------------------------------------------------------------------
     def __init__(self, root):
+        self.good_image_path= "good.jpg"
         self.root = root
         self.root.title("Image Viewer")
 
@@ -12,17 +19,16 @@ class ImageApp:
         self.load_last_directory()
 
         # Define layout: top area for image, bottom area for buttons, result area, and text area
-        self.image_label = tk.Label(self.root, bg="white")
+        self.image_label = tk.Label(self.root, bg="gray")
         self.image_label.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        self.good_image = Image.open("good.jpg")
-        self.good_image_label = tk.Label(self.root, bg="white")
+        self.good_image = Image.open( self.good_image_path)
+        self.good_image_label = tk.Label(self.root, bg="gray")
         self.good_image_label.grid(row=0, column=2, columnspan=2, sticky="nsew")
         self.good_image_tk = ImageTk.PhotoImage(self.good_image)
 
         self.good_image_label.config(image=self.good_image_tk)
         self.good_image_label.image = self.good_image_tk
-
 
         # Buttons
         self.open_button = tk.Button(self.root, text="Open", command=self.open_image)
@@ -57,6 +63,17 @@ class ImageApp:
 
         self.root.bind("<Configure>", self.on_resize)
 
+        self.init_llm()
+
+    # ----------------------------------------------------------------------------------------------
+    def init_llm(self):
+        pass
+
+    # ----------------------------------------------------------------------------------------------
+    def execute_llm(self, image) -> bool:
+        return False
+
+    # ----------------------------------------------------------------------------------------------
     def on_resize(self, event):
         # This method will be triggered when the window is resized
         # We can adjust the image size to fit within the window, keeping the aspect ratio
@@ -83,7 +100,7 @@ class ImageApp:
                 resized_image = self.image.resize((new_width, new_height))
                 self.image_tk = ImageTk.PhotoImage(resized_image)
 
-
+    # ----------------------------------------------------------------------------------------------
     def load_last_directory(self):
         # Load the last used directory path from a file, default to the current directory
         self.last_dir = os.getcwd()
@@ -92,7 +109,7 @@ class ImageApp:
                 self.last_dir = f.read().strip()
         except FileNotFoundError:
             pass
-
+    # ----------------------------------------------------------------------------------------------
     def open_image(self):
         # Open file dialog to select an image
         file_path = filedialog.askopenfilename(
@@ -114,47 +131,52 @@ class ImageApp:
                     f.write(self.last_dir)
 
                 # Update result area and message
-                self.result_area.config(bg="green")
+                self.result_area.config(bg="blue")
                 self.message_text.config(text="Success")
                 self.check_button.config(state="normal")
 
                 self.root.grid_rowconfigure(0, weight=1)  # Ensure the image area takes up space
                 self.root.grid_propagate(True)
-            except Exception as e:
-                self.result_area.config(bg="red")
-                self.check_button.config(state="disabled")
-                self.message_text.config(text="Failed: " + str(e))
 
+            except Exception as e:
+                self.result_area.config(bg="orange")
+                self.check_button.config(state="disabled")
+                self.message_text.config(text="Open Failed: " + str(e))
+
+    # ----------------------------------------------------------------------------------------------
     def display_image(self):
         # Resize the image to fit the image area while maintaining aspect ratio
         if self.image_tk:
             self.image_label.config(image=self.image_tk)
             self.image_label.image = self.image_tk
 
+    # ----------------------------------------------------------------------------------------------
     def exit_app(self):
         # Terminate the application
         self.root.quit()
 
+    # ----------------------------------------------------------------------------------------------
     def check_image(self):
         # When "Check" is pressed, show "Checked" in the message text
-        self.message_text.config(text="Checked")
+        try:
+            isOk= self.execute_llm( self.image)
+            self.message_text.config(text="Checked")
+            if isOk:
+                self.result_area.config(bg="green")
+                self.message_text.config(text="OK")
+            else:
+                self.result_area.config(bg="red")
+                self.message_text.config(text="KO")
+        except Exception as e:
+            self.result_area.config(bg="orange")
+            self.message_text.config(text="Check Failed: " + str(e))
 
+# --------------------------------------------------------------------------------------------------
 def main():
     root = tk.Tk()
     app = ImageApp(root)
     root.mainloop()
 
+# --------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
-
-
-"""
-    def on_resize(self, event):
-        # This method will be triggered when the window is resized
-        # We can adjust the image or layout if needed
-        if self.image_tk:
-            self.display_image()  # Call display_image to re-adjust the image if needed
-        # Optionally, you can add any additional resizing behavior for other widgets here.
-        self.root.grid_rowconfigure(0, weight=1)  # Ensure the image area takes up space
-        self.root.grid_propagate(True)
-"""
