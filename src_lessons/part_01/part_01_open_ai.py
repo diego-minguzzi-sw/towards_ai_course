@@ -16,7 +16,6 @@ def sendPrompt( userPrompt: str, maxTokens=60, temperature=0.7):
     log.error(f'Environment variable {OPEN_AI_KEY_NAME} not set.')
     return
   openaiKey=os.environ[OPEN_AI_KEY_NAME]
-  log.debug(f'{OPEN_AI_KEY_NAME}={openaiKey}')
 
   headers = {
       "Authorization": f"Bearer {openaiKey}",

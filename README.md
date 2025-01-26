@@ -1,7 +1,7 @@
 # Towards AI Online course "" #
 <p>
-This repository contains the code developed while attending the online course: 
-<a href="https://academy.towardsai.net/courses/beginner-to-advanced-llm-dev" target="_blank">From Beginner to Advanced LLM Developer</a>. 
+This repository contains the code developed while attending the online course:
+<a href="https://academy.towardsai.net/courses/beginner-to-advanced-llm-dev" target="_blank">From Beginner to Advanced LLM Developer</a>.
 </p>
 
 Directory tree:
@@ -40,7 +40,6 @@ Activate the environment with the command:
 
   # Loads the keys to the API(s).
   source ${REPO_ROOT}/api_keys/api_keys.sh
-  echo "OPENAI_API_KEY:${OPENAI_API_KEY}"
 
   export PYTHONPATH=${PYTHONPATH}:${REPO_ROOT}/src_py/lib
 

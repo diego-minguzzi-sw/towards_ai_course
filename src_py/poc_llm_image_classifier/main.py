@@ -2,16 +2,47 @@
 https://python.langchain.com/docs/how_to/multimodal_prompts/
 """
 from tkinter import filedialog, messagebox
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from PIL import Image, ImageTk
+
+import base64
+import io
+import IPython
+import logging as log
+import os
 import tkinter as tk
 import os
+
+LAST_DIRECTORY_FILE_NAME='.last_directory.txt'
+MODEL_NAME= 'gpt-4o-mini'
+PROMPT_IMAGE_WIDTH= 480
+
+# --------------------------------------------------------------------------------------------------
+def base64Encode( image, format='JPEG'):
+    imgBuffer= io.BytesIO()
+    image.save(imgBuffer,format=format)
+    return base64.b64encode( imgBuffer.getvalue()).decode('utf-8')
+
+# --------------------------------------------------------------------------------------------------
+def resizeImage( image, newWidth=512 ):
+    (imgWidth, imgHeight)= image.size
+    if (imgWidth<=0) or (imgHeight<=0):
+        return image
+    if imgWidth>newWidth:
+        newHeight= (newWidth * imgHeight) // imgWidth
+        return image.resize( size=( newWidth, newHeight))
+    return image
 
 # --------------------------------------------------------------------------------------------------
 class ImageApp:
 
     # ----------------------------------------------------------------------------------------------
     def __init__(self, root):
-        self.good_image_path= "good.jpg"
+        self.good_image_path= "rack_00_good.jpg"
         self.root = root
         self.root.title("Image Viewer")
 
@@ -22,7 +53,7 @@ class ImageApp:
         self.image_label = tk.Label(self.root, bg="gray")
         self.image_label.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        self.good_image = Image.open( self.good_image_path)
+        self.good_image = resizeImage( Image.open( self.good_image_path), PROMPT_IMAGE_WIDTH)
         self.good_image_label = tk.Label(self.root, bg="gray")
         self.good_image_label.grid(row=0, column=2, columnspan=2, sticky="nsew")
         self.good_image_tk = ImageTk.PhotoImage(self.good_image)
@@ -67,10 +98,59 @@ class ImageApp:
 
     # ----------------------------------------------------------------------------------------------
     def init_llm(self):
-        pass
+        self.promptTemplate = ChatPromptTemplate.from_messages([
+          ("system", "You are a helpful assistant that is able to classify images in the field of Laboratory automation"),
+          ("user", """
+You are shown an image of a rack placed on a shelf. The rack is a plastic object that can contain tubes.
+The rack is considered well positioned if:
+
+. One short side of the rack is close to the edge inside the shelf or on the edge, the short side is parallel to the edge, but not outside of the shelf
+. the long side of the rack is parallel and close to a green line on the shelf, touching the green line, but not crossing
+. the rack must not cross or hide the green line on the shelf.
+
+If the rack meets both conditions, respond with: YES.
+If the rack does not meet any of these conditions, respond with: NO.
+If you are unable to determine whether the rack meets these conditions, respond with UNSURE.
+
+Please reply with a first line containing the word: YES, NO, or UNSURE, and nothing else.
+In the next line, explain why you classified the image like that.
+
+The next message shows an image to which you must reply with:
+YES
+followed by the explanation.
+          """),
+          ("user",[ {"type": "image_url","image_url": {"url": "data:image/jpeg;base64,{image_ok_data}"},}]),
+          ("user", "Now, classify the following image and reply with either: YES, NO, or UNSURE; followed by the explanation."),
+          ("user",[ {"type": "image_url","image_url": {"url": "data:image/jpeg;base64,{image_check_data}"},}]),
+        ])
+        self.model = ChatOpenAI(model=MODEL_NAME)
+        print(f'MODEL_NAME:{MODEL_NAME}')
+        self.chain = self.promptTemplate | self.model | StrOutputParser()
 
     # ----------------------------------------------------------------------------------------------
     def execute_llm(self, image) -> bool:
+        encodedResizedImageOK= base64Encode( self.good_image)
+        print(f'encodedResizedImageOK len:{ len(encodedResizedImageOK)}')
+
+        encodedCheckImage= base64Encode( self.image)
+        print(f'encodedCheckImage len:{ len(encodedCheckImage)}')
+        try:
+          result = self.chain.invoke({'image_ok_data': encodedResizedImageOK,
+                                    'image_check_data':encodedCheckImage})
+          print(result)
+          resultRows=result.split('\n')
+          print(resultRows)
+          isOk= ( len(resultRows)>0 ) and ( resultRows[0].strip().upper().startswith('YES') )
+          strResult= 'OK:'
+          if not isOk:
+            strResult= 'KO:'
+          if len(resultRows)>=2:
+            strResult += resultRows[1]
+          self.message_text.config(text=strResult)
+          return isOk
+        except Exception as e:
+                self.result_area.config(bg="orange")
+                self.message_text.config(text="LLM: " + str(e))
         return False
 
     # ----------------------------------------------------------------------------------------------
@@ -105,7 +185,7 @@ class ImageApp:
         # Load the last used directory path from a file, default to the current directory
         self.last_dir = os.getcwd()
         try:
-            with open("last_directory.txt", "r") as f:
+            with open( LAST_DIRECTORY_FILE_NAME, "r") as f:
                 self.last_dir = f.read().strip()
         except FileNotFoundError:
             pass
@@ -121,13 +201,13 @@ class ImageApp:
             try:
                 # Open image and resize it to fit within the image area while keeping aspect ratio
                 self.image_path = file_path
-                self.image = Image.open(self.image_path)
+                self.image= resizeImage( Image.open(self.image_path), PROMPT_IMAGE_WIDTH)
                 self.image_tk = ImageTk.PhotoImage(self.image)
                 self.display_image()
 
                 # Save the directory of the image
                 self.last_dir = os.path.dirname(file_path)
-                with open("last_directory.txt", "w") as f:
+                with open( LAST_DIRECTORY_FILE_NAME, "w") as f:
                     f.write(self.last_dir)
 
                 # Update result area and message
@@ -160,13 +240,10 @@ class ImageApp:
         # When "Check" is pressed, show "Checked" in the message text
         try:
             isOk= self.execute_llm( self.image)
-            self.message_text.config(text="Checked")
             if isOk:
                 self.result_area.config(bg="green")
-                self.message_text.config(text="OK")
             else:
                 self.result_area.config(bg="red")
-                self.message_text.config(text="KO")
         except Exception as e:
             self.result_area.config(bg="orange")
             self.message_text.config(text="Check Failed: " + str(e))

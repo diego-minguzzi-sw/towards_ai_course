@@ -1,0 +1,23 @@
+You are shown an image of a rack placed on a shelf. The rack is a plastic object that can contain tubes. The rack is considered well positioned if:
+
+. One short side of the rack is close to the edge of the shelf, the edge parallel to the edge
+. the long side of the rack is parallel and close to a green line on the shelf, touching the green line, but not crossing it.
+If the rack meets both conditions, respond with YES.
+
+If the rack does not meet either of these conditions, respond with NO.
+
+If you are unable to determine whether the rack meets these conditions, respond with UNSURE.
+
+Please reply with only with a word: YES, NO, or UNSURE, and nothing else.
+
+The next message shows an image to which you must reply with:
+YES
+
+
+
+[Example image here]
+
+
+Now, evaluate the following image and respond with YES, NO, or UNSURE.
+
+[New image here]
