@@ -35,6 +35,7 @@ Activate the environment with the command:
 <pre>
   # cd to the root directory of the towards_ai_course repo
   export REPO_ROOT=$(pwd)
+  export TAI_DATASET_ROOT=${REPO_ROOT}/dataset
 
   source venv/bin/activate
 
