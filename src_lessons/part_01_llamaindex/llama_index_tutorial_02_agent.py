@@ -13,9 +13,6 @@ from llama_index.llms.openai import OpenAI
 from llama_index.core.tools import FunctionTool
 from llama_index.core.workflow import Context
 
-
-
-
 import logging as log
 import os
 
