@@ -45,6 +45,7 @@ Activate the environment with the command:
   export PYTHONPATH=${PYTHONPATH}:${REPO_ROOT}/src_py/lib
 
   # Langchain POC Notebooks
+  cd ${REPO_ROOT}/src_lessons/part_01_2_chroma_vector_db
   cd ${REPO_ROOT}/src_notebooks/nb_langchain
   jupyter notebook
 </pre>
