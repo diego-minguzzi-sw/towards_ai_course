@@ -1,0 +1,3 @@
+[submodule "third_party/linkedin-api-python-client"]
+	path = third_party/linkedin-api-python-client
+	url = https://github.com/linkedin-developers/linkedin-api-python-client.git
