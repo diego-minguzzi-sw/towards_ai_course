@@ -14,6 +14,7 @@ langchain-google-genai==2.0.9
 langchain-openai==0.3.2
 langchain-chroma==0.2.2
 llama-index==0.12.15
+llama-index-embeddings-gemini==0.3.2
 llama-index-embeddings-huggingface==0.5.2
 llama-index-finetuning==0.3.0
 llama-index-llms-gemini==0.4.5
@@ -29,9 +30,5 @@ python-lsp-server==1.11.0
 scikit-learn==1.6.1
 sentence-transformers==3.4.1
 linkedin-api-client==0.3.0
-
-
-
-
-
-
+newspaper3k==0.2.8
+lxml_html_clean==0.4.1
