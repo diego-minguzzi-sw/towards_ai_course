@@ -51,6 +51,7 @@ Activate the environment with the command:
 </pre>
 </code>
 
+<hr>
 
 # Links
 <ul>
