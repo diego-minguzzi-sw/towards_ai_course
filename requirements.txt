@@ -15,12 +15,15 @@ langchain-openai==0.3.2
 langchain-chroma==0.2.2
 llama-index==0.12.15
 llama-index-embeddings-gemini==0.3.2
+llama-index-embeddings-google-genai==0.7.0
 llama-index-embeddings-huggingface==0.5.2
 llama-index-finetuning==0.3.0
 llama-index-llms-gemini==0.4.5
+llama-index-llms-google-genai=0.1.7
 llama-index-llms-together==0.3.1
 llama-index-readers-web==0.3.7
 llama-index-vector-stores-chroma==0.4.1
+llama-index-vector-stores-qdrant==0.6.0
 openai==1.59.8
 pandas==2.2.3
 pillow==10.4.0
