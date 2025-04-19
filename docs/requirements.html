@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAI Project: Requirements</title>
+</head>
+<body>
+<h1>TAI Project: RAG Tool - Requirements</h1>
+
+<ul>
+<li>User Log in</li>
+<li>Prompts
+    <ul>
+    <li>The user can insert a new prompt</li>
+    <Li>The user can edit an existing prompt: a previously submitted prompt</li>
+    <li>The user can remove a previously submitted prompt</li>
+    <li>The user can submit again an old prompt (maybe the system now has different data).</li>
+    </ul>
+  </li>
+<li>Documents: the user can upload a txt, pdf, or chm document; the user can also upload an image, that is then scanned.
+    <ul>
+    <li>Each document is related to a topic</li>
+    <li>Upon document upload, the user can check the option of generating a document summary, that is then added as a metadata</li>
+    <li>Upon upload, the system proposes a title of the document, that the user can edit or accept</li>
+    <li>The user can later remove a document, doing so it removes the document, the metadata and all the chunks</li>
+    <li>The system tries to extract tag words from each document: keywords to understand the subject of the document</li>
+    <li>There is a page with document status: for each document it shows the processing status:
+        <ul>
+        <li>Processed</li>
+        <li>Processing</li>
+        <li>Disabled</li>
+        </ul>
+      </li>
+    <li>Each document has related metadata:
+        <ul>
+        <li>Digest</li>
+        <li>Title</li>
+        <li>Submission date</li>
+        <li>tags</li>
+        <li>Optional document summary</li>
+        </ul>
+      <li>Each document chunk can have one or more related images, each image has a caption, or description</li>
+
+    </ul>
+
+  </li>
+<li>Topics: the user can add, rename and delete topics<br>
+    A default topic exists
+  </li>
+<li>Language support: English and Italian, both related to UI and prompts</li>
+
+<li>Log
+    <ul>
+    <li>Severity filter</li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h2>Prompt execution</h2>
+<ul>
+<li>Pre execution classification: the system checks whether it is a forbidden request, or if it can respond with the tools it has.
+  </li>
+<li>Execution. Given the user prompt, it breaks the question into one or more steps.<br>
+    For each step
+    <ul>
+    <li>If it is a question on the topics of the knowledge base (i.e. vector DB), the use the RAG </li>
+    <Li>Search the web</li>
+    <li>Break the question into multiple steps, gather the results and the reply</li>
+    </ul>
+  </li>
+<li>Post execution evaluation: the systems checks whether the answer is relevant to the posed question, otherwise it raises a message to the user and it does not display the answer.</li>
+</ul>
+
+<hr>
+
+<h2>Document upload</h2>
+<ul>
+<li>The same document is not uploaded twice</li>
+<Li>In order to add the chunks to the Vector DB, the system has a background task, so that the user can query the system anytime, even if a document is processed</li>
+</ul>
+
+
+<h2>Logging</h2>
+<ul>
+<li>The system logs all requests and responses</li>
+<li>The system monitor prompt usage</li>
+</ul>
+
+<hr>
+<h2>POC(s) to develop</h2>
+<ul>
+<li>(_) LLM Timed Wrapper</li>
+<li>(_) Multiple parallel requests with different keys</li>
+<li>(_) UI library</li>
+<li>(_) Fast API</li>
+<li>(_) Vector DB</li>
+<li>(_) Lang Chain</li>
+<li>(_) Lang Graph</li>
+<li>(_) OCR service</li>
+<li>(_) Py PDF</li>
+<li>(_) Web scraper</li>
+<li>(_) </li>
+<li>(_) </li>
+</ul>
+
+<hr>
+
+<hr>
+
+
+<p>Your draft for a RAG tool's requirements is well-thought-out, covering a wide range of functionalities! Here are some suggestions and potential additions that you might find useful:</p>
+
+<h3>Suggestions for Enhancements</h3>
+<ol>
+  <li><strong>Enhanced User Authentication:</strong>
+    <ul>
+      <li>Consider adding multi-factor authentication for security.</li>
+      <li>Allow integration with Single Sign-On (SSO) platforms.</li>
+    </ul>
+  </li>
+  <li><strong>Version History for Prompts:</strong>
+    <ul>
+      <li>Track and store versions of edited prompts so users can revert to earlier versions if needed.</li>
+    </ul>
+  </li>
+  <li><strong>Dynamic Prompt Suggestions:</strong>
+    <ul>
+      <li>Based on past user interactions or system capabilities, recommend prompts the user might find useful.</li>
+    </ul>
+  </li>
+  <li><strong>Improved Document Processing:</strong>
+    <ul>
+      <li>Allow users to upload more file types, such as <code>.docx</code> or <code>.odt</code>.</li>
+      <li>Include Optical Character Recognition (OCR) for processing scanned documents or images with text.</li>
+      <li>Provide feedback to users on the processing status of their documents.</li>
+    </ul>
+  </li>
+  <li><strong>Tag Management:</strong>
+    <ul>
+      <li>Allow users to manually add, edit, or delete tags for better customization and accuracy.</li>
+      <li>Consider implementing automatic tagging refinement using advanced natural language processing.</li>
+    </ul>
+  </li>
+  <li><strong>Visualization of Metadata:</strong>
+    <ul>
+      <li>Use graphs or charts to provide insights into the document database, such as the distribution of topics, tags, or submission dates.</li>
+    </ul>
+  </li>
+  <li><strong>Advanced Topic Management:</strong>
+    <ul>
+      <li>Implement a hierarchical topic system, where topics can have subtopics for better organization.</li>
+    </ul>
+  </li>
+</ol>
+
+<h3>Functionalities to Add or Adjust</h3>
+<ol>
+  <li><strong>Context-Aware Execution:</strong>
+    <ul>
+      <li>Include a contextual analysis step to determine if the current prompt is related to previously submitted prompts, allowing for better continuity in responses.</li>
+    </ul>
+  </li>
+  <li><strong>Feedback Loop for Answer Quality:</strong>
+    <ul>
+      <li>Allow users to rate responses and provide feedback, which could help improve the system's relevance.</li>
+    </ul>
+  </li>
+  <li><strong>Automatic Summarization:</strong>
+    <ul>
+      <li>Add functionality to generate brief summaries of uploaded documents to save time.</li>
+    </ul>
+  </li>
+  <li><strong>Enhanced Search Capabilities:</strong>
+    <ul>
+      <li>Add a faceted search option for querying the document repository by tags, topics, or metadata.</li>
+    </ul>
+  </li>
+  <li><strong>Notification System:</strong>
+    <ul>
+      <li>Notify users when a background task, such as document processing, is complete.</li>
+    </ul>
+  </li>
+  <li><strong>Compliance and Security Logging:</strong>
+    <ul>
+      <li>Add an option to store logs with encryption for compliance with data privacy regulations.</li>
+    </ul>
+  </li>
+</ol>
+
+<h3>Usability and User Experience</h3>
+<ol>
+  <li><strong>Interactive Tutorials:</strong>
+    <ul>
+      <li>Include an onboarding process with interactive tutorials to help users understand how to use the tool effectively.</li>
+    </ul>
+  </li>
+  <li><strong>Customizable Interface:</strong>
+    <ul>
+      <li>Allow users to personalize their dashboard with widgets or shortcuts.</li>
+    </ul>
+  </li>
+  <li><strong>Dark Mode and Accessibility Features:</strong>
+    <ul>
+      <li>Offer a dark mode and ensure the interface complies with accessibility standards (e.g., WCAG).</li>
+    </ul>
+  </li>
+</ol>
+
+<p>These are just suggestions to help refine and expand the functionality of your project. Let me know if you'd like me to elaborate on any of these ideas!</p>
+
+
+<hr>
+
+
+</body>
+</html>
