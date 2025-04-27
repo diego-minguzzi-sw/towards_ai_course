@@ -10,18 +10,19 @@
 
 <ul>
 <li>User Log in</li>
-<li>Prompts
+<li>Prompt Library
     <ul>
     <li>The user can insert a new prompt</li>
     <Li>The user can edit an existing prompt: a previously submitted prompt</li>
     <li>The user can remove a previously submitted prompt</li>
-    <li>The user can submit again an old prompt (maybe the system now has different data).</li>
+    <li>The user can run again an old prompt (maybe the system now has different data).</li>
     </ul>
   </li>
 <li>Documents: the user can upload a txt, pdf, or chm document; the user can also upload an image, that is then scanned.
     <ul>
     <li>Each document is related to a topic</li>
-    <li>Upon document upload, the user can check the option of generating a document summary, that is then added as a metadata</li>
+    <li>Upon document upload, the user can check the option of generating a document summary, <br>
+        that is then added as a metadata</li>
     <li>Upon upload, the system proposes a title of the document, that the user can edit or accept</li>
     <li>The user can later remove a document, doing so it removes the document, the metadata and all the chunks</li>
     <li>The system tries to extract tag words from each document: keywords to understand the subject of the document</li>
@@ -61,7 +62,8 @@
 
 <h2>Prompt execution</h2>
 <ul>
-<li>Pre execution classification: the system checks whether it is a forbidden request, or if it can respond with the tools it has.
+<li>Pre execution classification: the system checks whether it is a forbidden request, <br>
+    or if it can respond with the tools it has available.
   </li>
 <li>Execution. Given the user prompt, it breaks the question into one or more steps.<br>
     For each step
@@ -71,7 +73,8 @@
     <li>Break the question into multiple steps, gather the results and the reply</li>
     </ul>
   </li>
-<li>Post execution evaluation: the systems checks whether the answer is relevant to the posed question, otherwise it raises a message to the user and it does not display the answer.</li>
+<li>Post execution evaluation: the systems checks whether the answer is relevant to the question,<br>
+    otherwise it raises a message to the user and it does not display the answer.</li>
 </ul>
 
 <hr>
@@ -92,12 +95,16 @@
 <hr>
 <h2>POC(s) to develop</h2>
 <ul>
+<li>(_) asyncio: how to create a task queue</li>
+<li>(_) Lang Chain</li>
 <li>(_) LLM Timed Wrapper</li>
 <li>(_) Multiple parallel requests with different keys</li>
 <li>(_) UI library</li>
 <li>(_) Fast API</li>
+<li>(_) Open API</li>
+<li>(_) Swagger</li>
 <li>(_) Vector DB</li>
-<li>(_) Lang Chain</li>
+
 <li>(_) Lang Graph</li>
 <li>(_) OCR service</li>
 <li>(_) Py PDF</li>

@@ -1,0 +1,109 @@
+@startuml
+!define RECTANGLE class
+
+' Generate using:
+
+' java -jar /home/minguzzi/download/plantUML/plantuml-1.2025.2.jar -o${REPO_ROOT}/docs/tech_kb_project/uml_schemas ${REPO_ROOT}/docs/tech_kb_project/document.puml
+
+title Tech KB Doc
+
+class Id
+
+package entities
+{
+package doc
+{
+
+class Document
+{
+  string            title
+  Section           rootSection
+  DocumentMetadata  metadata
+}
+
+class DocumentMetadata
+{
+  List[byte]  digest
+  string      filename
+  DateTime    date
+}
+
+Document "1" *-- "1" DocumentMetadata
+
+class Section
+{
+  string    title
+  Section   parentSection
+  [Section] subSections
+  Paragraph paragraph
+
+  addSubsection(Section)
+}
+
+Document "1" *-- "1" Section
+
+Section "*" o-- "[0..1]" Section : parentSection >
+
+class Paragraph
+{
+  List[string] text
+  List[Figure] figures
+}
+
+Section  *-- "1" Paragraph
+
+class Figure
+{
+  Image   image
+  string  caption
+}
+
+Paragraph "1" *-- "*" Figure
+
+
+class ParagraphStyleName
+
+string <|-- ParagraphStyleName
+
+class ParagraphStyleRank
+{
+  List[ List[ ParagraphStyleName] ] paragraphStyles
+
+  bool isValid( ParagraphStyleName)
+  int getRank( ParagraphStyleName)
+}
+
+class WordDocumentProfile
+{
+  ParagraphStyleRank paragraphStyleRank
+}
+
+WordDocumentProfile *-- ParagraphStyleRank
+
+}
+' package doc
+}
+' package entities
+
+package doc_rw
+{
+
+abstract class DocumentReader
+{
+  Document readDocument( filename )
+
+}
+
+class WordDocumentReader
+{
+}
+
+DocumentReader <|-- WordDocumentReader
+WordDocumentReader o-- entities.doc.WordDocumentProfile
+
+
+
+}
+' package doc_rw
+
+@enduml

@@ -1,0 +1,52 @@
+
+
+
+class Figure
+  Id
+  Image
+  caption: string
+
+class Paragraph
+  Id
+  text:    List[string]
+  figures: List[Figure]
+
+
+class Section
+  Id
+  title: String
+  paragraph: Paragraph
+  subsections: List[Section]
+
+
+class Document
+  id: int
+  title: string
+  Section
+
+class DocumentMetadata
+  digest
+  filename
+  date
+
+DocumentStorage
+
+
+----------------------------------------------------------------------------------------------------
+There is a component that reads PDF and creates a Document
+
+There is a component that has a Document as input and creates DocChunks according to some parameters
+
+DocChunk can be
+  ParagraphId : identifier to a section of a document
+  TextChunk
+  FigureChunk
+
+Embeddable: it is possible to create embeddings from it
+
+
+Embedder : a component that can create embeddings from a
+Class Document
+  title
+  digest
+  tags
