@@ -5,3 +5,4 @@
 from .paragraph import Paragraph
 from .section   import Section
 from .document  import Document
+from .metadata  import Metadata
