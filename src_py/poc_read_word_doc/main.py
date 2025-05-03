@@ -8,7 +8,10 @@ import logging as log
 import os
 
 """
-python3 ${REPO_ROOT}/src_py/poc_read_word_doc/main.py ${TAI_DATASET_ROOT}/cobot_kb/Example.doc
+python3 ${REPO_ROOT}/src_py/poc_read_word_doc/main.py ${TAI_DATASET_ROOT}/cobot_kb/Example.docx
+python3 ${REPO_ROOT}/src_py/poc_read_word_doc/main.py ${TAI_DATASET_ROOT}/cobot_kb/Example2.docx
+python3 ${REPO_ROOT}/src_py/poc_read_word_doc/main.py ${TAI_DATASET_ROOT}/cobot_kb/TCS_Users_Guide_3.0C1.docx
+python3 ${REPO_ROOT}/src_py/poc_read_word_doc/main.py ${TAI_DATASET_ROOT}/cobot_kb/Guidance_Programming_Language.docx
 """
 
 if __name__ == "__main__":

@@ -27,7 +27,6 @@ The environment is, for example, in a directory called <code>env</code>. To crea
 </pre>
 </code>
 
-
 ### Environment activation
 Activate the environment with the command:
 

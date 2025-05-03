@@ -22,6 +22,6 @@ class WordDocumentProfile:
               ['Heading 4'],
               ['Heading 5'],
               ['Heading 6'],
-              ['Normal','No Spacing','List Paragraph']
+              ['Normal','No Spacing','List Paragraph','Body Text','Code','Table Paragraph']
       ]
       return ParagraphStyleRank( ranks)

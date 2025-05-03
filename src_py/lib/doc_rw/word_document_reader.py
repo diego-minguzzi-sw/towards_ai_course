@@ -18,7 +18,6 @@ class WordDocumentReader(DocumentReader):
     self._parStyleRank= self._docProfile.paragraphStyleRank
 
   def readDocument(self, filepath: str) -> Document:
-    log.debug('readDocument started.')
     metadata = Metadata.createFromFilepath( filepath)
 
     tmpTitle = os.path.splitext(os.path.basename(filepath))[0]
@@ -29,7 +28,7 @@ class WordDocumentReader(DocumentReader):
     paragraphs= wordDoc.paragraphs
 
     if len(paragraphs)==0:
-      return Document( "", metadata)
+      return Document( '', metadata)
 
     rootSection= Section()
 
@@ -41,7 +40,6 @@ class WordDocumentReader(DocumentReader):
                                             indxParagraph=indxParagraph,
                                             parentSection=rootSection)
 
-    log.debug('readDocument terminated.')
     return Document( tmpTitle, metadata, rootSection)
 
   #------------------------------------------------------------------------------------------------
@@ -50,24 +48,22 @@ class WordDocumentReader(DocumentReader):
                         indxParagraph: int,
                         parentSection: Section,
                         parentRank:int=0) -> int:
-    log.debug(f'_traverseSection started: indxParagraph:{indxParagraph}')
+    # log.debug(f'_traverseSection started: indxParagraph:{indxParagraph}')
     indx = indxParagraph
 
     par= paragraphs[indx]
     parStyleName= par.style.name
 
     if self._parStyleRank.isTextRank( parStyleName):
-      log.debug(f'parStyleName: indx:{indx} {parStyleName}: got text rank.')
       (indx, paragraph) = self._traverseParagraph( paragraphs, indx)
-      parentSection.createSubsection( paragraph=paragraph)
+      currSection= parentSection.createSubsection( paragraph=paragraph)
+      log.debug(f'createSubsection: \"{currSection.parentTitle()}\" -> \"{currSection.title}\" depth:{currSection.depth}')
     else:
-      log.debug(f'parStyleName: indx:{indx} {parStyleName}: got header rank.')
       while indx<len(paragraphs):
         par= paragraphs[indx]
         parStyleName= par.style.name
         sectRank = self._parStyleRank.getRank( parStyleName)
         if sectRank <= parentRank:
-          log.debug(f'_traverseSection terminated: indx:{indx}')
           return indx
 
         sectionTitle= par.text
@@ -78,18 +74,25 @@ class WordDocumentReader(DocumentReader):
           nextParName= nextPar.style.name
           if self._parStyleRank.isTextRank( nextParName):
             (indx, paragraph) = self._traverseParagraph( paragraphs, nextIndx)
+            if indx>=len(paragraphs):
+              currSection= parentSection.createSubsection( title= sectionTitle, paragraph=paragraph)
+              log.debug(f'createSubsection: \"{currSection.parentTitle()}\" -> \"{currSection.title}\" depth:{currSection.depth}')
+              # log.debug(f'paragraph text:{paragraph.allText()}')
+              return indx
+            nextIndx= indx
+            nextPar= paragraphs[ nextIndx]
+            nextParName= nextPar.style.name
           else:
             paragraph= Paragraph()
 
           currSection= parentSection.createSubsection( title= sectionTitle, paragraph=paragraph)
-          nextRank = self._parStyleRank.getRank( nextParName)
-          log.debug(f'parStyleName: indx:{indx} {parStyleName}: sectRank:{sectRank} nextRank:{nextRank}')
-          if sectRank < nextRank:
-            log.debug('About to call _traverseSection.')
-            indx = self._traverseSection(paragraphs, nextIndx, currSection, sectRank)
-            log.debug(f'_traverseSection ws executed: indx:{indx}')
+          log.debug(f'\"{currSection.parentTitle()}\" -> \"{currSection.title}\" {parStyleName} depth:{currSection.depth}')
+          # log.debug(f'paragraph text:{paragraph.allText()}')
 
-    log.debug(f'_traverseSection terminated: indx:{indx}')
+          nextRank = self._parStyleRank.getRank( nextParName)
+          if sectRank < nextRank:
+            indx = self._traverseSection(paragraphs, nextIndx, currSection, sectRank)
+
     return indx
 
   #------------------------------------------------------------------------------------------------
@@ -102,12 +105,9 @@ class WordDocumentReader(DocumentReader):
     while indx < len(paragraphs):
       parStyleName= paragraphs[indx].style.name
       if self._parStyleRank.isTextRank( parStyleName):
-        log.debug(f'parStyleName: {parStyleName}: text rank. Added to paragraph.')
         result.addTextRow( paragraphs[indx].text)
         indx += 1
       else:
-        log.debug(f'parStyleName: {parStyleName}: not text rank. terminating.')
         break
 
     return (indx, result)
-
