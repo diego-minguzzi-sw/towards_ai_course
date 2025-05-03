@@ -26,5 +26,15 @@ class Paragraph:
     return self._text
 
   #-----------------------------------------------------------------------------------------------
+  def allText(self) -> str:
+    return ''.join(self._text)
+
+  #-----------------------------------------------------------------------------------------------
+  def addTextRow(self, textRow: str):
+    if str != type(textRow):
+      raise TypeError('textRow')
+    self._text.append( textRow)
+
+  #-----------------------------------------------------------------------------------------------
   def numTextLines(self) -> int:
     return len(self._text)

@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # Diego Minguzzi 2025
 
-ParagraphStyleRank = int
+ParagraphRank = int
 ParagraphStyleName = str
 
 class ParagraphStyle:
-  def __init__(self, name: ParagraphStyleName, rank: ParagraphStyleRank):
+  def __init__(self, name: ParagraphStyleName, rank: ParagraphRank):
     if str != type(name):
       raise TypeError('name')
 

@@ -3,7 +3,7 @@
 # Diego Minguzzi 2025
 import typing
 
-from .paragraph_style import ParagraphStyleName, ParagraphStyleRank
+from .paragraph_style import ParagraphStyleName, ParagraphRank
 
 class ParagraphStyleRank:
 
@@ -16,7 +16,7 @@ class ParagraphStyleRank:
         return True
     return False
 
-  def getRank( self, styleName: ParagraphStyleName) -> ParagraphStyleRank:
+  def getRank( self, styleName: ParagraphStyleName) -> ParagraphRank:
     rank = 0
 
     for rankStyles in self._paragraphStyles:
@@ -25,11 +25,21 @@ class ParagraphStyleRank:
         return rank
     raise ValueError(f"Invalid styleName: {styleName}")
 
+  def isDocumentRank( self, styleName: ParagraphStyleName) -> bool:
+    rank = self.getRank(styleName)
+    return 0 == rank
+
   def isTopRank( self, styleName: ParagraphStyleName) -> bool:
     rank = self.getRank(styleName)
-    return rank >= 1
+    return 1 == rank
 
   def isBottomRank( self, styleName: ParagraphStyleName) -> bool:
     rank = self.getRank(styleName)
     return rank >= len(self._paragraphStyles)
+
+  def isTextRank( self, styleName: ParagraphStyleName) -> bool:
+    return self.isBottomRank( styleName)
+
+  def isHeaderRank( self, styleName: ParagraphStyleName) -> bool:
+    return not self.isBottomRank( styleName)
 

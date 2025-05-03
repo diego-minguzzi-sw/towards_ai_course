@@ -38,7 +38,7 @@ class Section:
     return self._parentSection
 
   def createSubsection( self,
-                        title: str,
+                        title: str= '',
                         paragraph: Paragraph= Paragraph()):
     newSection= Section(title=title,
                         paragraph=paragraph,
@@ -51,3 +51,6 @@ class Section:
 
   @property
   def numSubsections( self) -> int: return len( self._subSections)
+
+  def __str__(self):
+    return f'(title:{self._title})'

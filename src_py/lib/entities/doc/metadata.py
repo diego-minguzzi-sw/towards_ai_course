@@ -47,24 +47,23 @@ class Metadata:
   def __str__( self):
     return f'(filename:{self._filename}, filepath:{self._filepath}, digest:{self._digest.hex()}, creationTime:{self._creationTime})'
 
+  @staticmethod
+  def createFromFilepath(filePath: str) -> 'Metadata':
 
-#--------------------------------------------------------------------------------------------------
-def createMetadata(filePath: str) -> 'Metadata':
+    if not os.path.exists(filePath):
+      raise FileNotFoundError(f'{filePath} does not exist')
 
-  if not os.path.exists(filePath):
-    raise FileNotFoundError(f'{filePath} does not exist')
+    if not os.path.isfile(filePath):
+      raise ValueError(f'{filePath} is not a file')
 
-  if not os.path.isfile(filePath):
-    raise ValueError(f'{filePath} is not a file')
+    filename = os.path.basename(filePath)
+    creationTime = dt.datetime.fromtimestamp(os.path.getmtime(filePath))
 
-  filename = os.path.basename(filePath)
-  creationTime = dt.datetime.fromtimestamp(os.path.getmtime(filePath))
+    with open(filePath, 'rb') as file:
+      fileContent = file.read()
+      digest = hashlib.md5(fileContent).digest()
 
-  with open(filePath, 'rb') as file:
-    fileContent = file.read()
-    digest = hashlib.md5(fileContent).digest()
-
-  return Metadata(filename=filename, digest=digest, creationTime=creationTime)
+    return Metadata(filename=filename, digest=digest, creationTime=creationTime)
 
 #--------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -74,7 +73,7 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   try:
-    metadata = createMetadata(args.file)
+    metadata = Metadata.createFromFilepath(args.file)
     print(metadata)
   except (FileNotFoundError, ValueError, TypeError) as e:
     print(f"Error: {e}")

@@ -31,12 +31,14 @@ def traverseDocument(filepath):
             print(f"Header 3: {paragraph.text}")
         elif paragraph.style.name == 'Heading 4':
             print(f"Header 4: {paragraph.text}")
+        elif paragraph.style.name == 'Heading 5':
+            print(f"Header 5: {paragraph.text}")
         else:
             # Print normal text if it's not a heading
             if 0==len(str(paragraph.text).strip()):
               continue
 
-            print(f"{paragraph.style.name}: {paragraph.text}")
+            print(f"Unknown style: {paragraph.style.name}: content:{paragraph.text}")
 
         # Detect pictures in the paragraph
         for run in paragraph.runs:

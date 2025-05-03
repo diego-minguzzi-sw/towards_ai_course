@@ -5,5 +5,5 @@
 from .document_reader import DocumentReader
 from .word_document_reader import WordDocumentReader
 from .paragraph_style import ParagraphStyle
-from .paragraph_style_rank import ParagraphStyleRank
+from .paragraph_style_rank import ParagraphRank, ParagraphStyleRank
 from .word_document_profile import WordDocumentProfile
