@@ -8,6 +8,8 @@ import copy
 
 ##################################################################################################
 class Document:
+  """ Document entity, composes of metadata and a tree of Sections.
+  """
   #-----------------------------------------------------------------------------------------------
   def __init__( self,
                 title: str,
@@ -37,4 +39,15 @@ class Document:
 
   @property
   def metadata( self): return self._metadata
+
+  def visitSectionsDepthFirst(self, visitor: callable):
+    """  visitor accepts a Section as only argument. """
+
+    def _visit(section: Section):
+      visitor(section)
+      for subsection in section.subsections:
+        _visit( subsection)
+
+    _visit(self._rootSection)
+
 

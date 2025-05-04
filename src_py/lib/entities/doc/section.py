@@ -8,7 +8,7 @@ import copy
 
 ##################################################################################################
 class Section:
-
+  """ A document section; it can have subsections and it has a paragraph, possibly empty.  """
   def __init__( self,
                 title: str= '',
                 paragraph: Paragraph= Paragraph(),
@@ -35,6 +35,9 @@ class Section:
   @property
   def paragraph( self): return self._paragraph
 
+  def paragraphAllText(self) -> str:
+    return self._paragraph.allText().strip()
+
   @property
   def hasParentSection( self) -> bool:
     return None != self._parentSection
@@ -47,7 +50,8 @@ class Section:
       return rootTitle
     return self._parentSection.title
 
-  def isRootSection( self) -> bool:
+  def isRoot( self) -> bool:
+    """ Whether this section is the root, otherwise it has a valid parent section. """
     return None == self._parentSection
 
   def hasParentSection( self) -> bool:
@@ -68,6 +72,12 @@ class Section:
 
   @property
   def numSubsections( self) -> int: return len( self._subSections)
+
+  @property
+  def hasSubsections( self) -> int: return (0 != len( self._subSections))
+
+  @property
+  def hasNoSubsections( self) -> int: return (0 == len( self._subSections))
 
   @property
   def depth( self) -> int: return self._depth

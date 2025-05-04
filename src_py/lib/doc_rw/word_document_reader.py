@@ -12,10 +12,12 @@ import typing
 
 class WordDocumentReader(DocumentReader):
 
-  def __init__( self):
+  def __init__( self, stripParagraphs: bool= True):
     super().__init__()
     self._docProfile= WordDocumentProfile()
     self._parStyleRank= self._docProfile.paragraphStyleRank
+
+    self._stripParagraphs= stripParagraphs
 
   def readDocument(self, filepath: str) -> Document:
     metadata = Metadata.createFromFilepath( filepath)
@@ -36,9 +38,10 @@ class WordDocumentReader(DocumentReader):
     parStyleName= par.style.name
 
     while indxParagraph < len(paragraphs):
-      indxParagraph = self._traverseSection(paragraphs=paragraphs,
-                                            indxParagraph=indxParagraph,
-                                            parentSection=rootSection)
+      indx = self._traverseSection( paragraphs=paragraphs,
+                                    indxParagraph=indxParagraph,
+                                    parentSection=rootSection)
+      indxParagraph= indx
 
     return Document( tmpTitle, metadata, rootSection)
 
@@ -48,7 +51,6 @@ class WordDocumentReader(DocumentReader):
                         indxParagraph: int,
                         parentSection: Section,
                         parentRank:int=0) -> int:
-    # log.debug(f'_traverseSection started: indxParagraph:{indxParagraph}')
     indx = indxParagraph
 
     par= paragraphs[indx]
@@ -57,41 +59,51 @@ class WordDocumentReader(DocumentReader):
     if self._parStyleRank.isTextRank( parStyleName):
       (indx, paragraph) = self._traverseParagraph( paragraphs, indx)
       currSection= parentSection.createSubsection( paragraph=paragraph)
-      log.debug(f'createSubsection: \"{currSection.parentTitle()}\" -> \"{currSection.title}\" depth:{currSection.depth}')
+
     else:
       while indx<len(paragraphs):
         par= paragraphs[indx]
         parStyleName= par.style.name
+        assert( not self._parStyleRank.isTextRank( parStyleName))
+
         sectRank = self._parStyleRank.getRank( parStyleName)
         if sectRank <= parentRank:
           return indx
 
         sectionTitle= par.text
 
-        if (indx+1)<len(paragraphs):
+        if (indx+1) >= len(paragraphs):
+          currSection= parentSection.createSubsection( title= sectionTitle, paragraph=Paragraph())
+          return indx+1 # TODO
+        else:
           nextIndx= indx+1
           nextPar= paragraphs[ nextIndx]
           nextParName= nextPar.style.name
+          nextRank = self._parStyleRank.getRank( nextParName)
+
           if self._parStyleRank.isTextRank( nextParName):
             (indx, paragraph) = self._traverseParagraph( paragraphs, nextIndx)
             if indx>=len(paragraphs):
               currSection= parentSection.createSubsection( title= sectionTitle, paragraph=paragraph)
-              log.debug(f'createSubsection: \"{currSection.parentTitle()}\" -> \"{currSection.title}\" depth:{currSection.depth}')
-              # log.debug(f'paragraph text:{paragraph.allText()}')
               return indx
+
             nextIndx= indx
             nextPar= paragraphs[ nextIndx]
             nextParName= nextPar.style.name
+            assert( not self._parStyleRank.isTextRank( nextParName))
+            nextRank = self._parStyleRank.getRank( nextParName)
           else:
             paragraph= Paragraph()
 
           currSection= parentSection.createSubsection( title= sectionTitle, paragraph=paragraph)
-          log.debug(f'\"{currSection.parentTitle()}\" -> \"{currSection.title}\" {parStyleName} depth:{currSection.depth}')
-          # log.debug(f'paragraph text:{paragraph.allText()}')
 
           nextRank = self._parStyleRank.getRank( nextParName)
           if sectRank < nextRank:
             indx = self._traverseSection(paragraphs, nextIndx, currSection, sectRank)
+          elif nextRank <= parentRank:
+            return nextIndx
+          else:
+            indx = nextIndx
 
     return indx
 
@@ -100,14 +112,31 @@ class WordDocumentReader(DocumentReader):
                          paragraphs,
                          indxParagraph: int) -> typing.Tuple[int, Paragraph]:
     indx= indxParagraph
-    result = Paragraph()
+    textRows= list()
+
+    hasFoundNonEmptyRow= False
 
     while indx < len(paragraphs):
       parStyleName= paragraphs[indx].style.name
+
       if self._parStyleRank.isTextRank( parStyleName):
-        result.addTextRow( paragraphs[indx].text)
+        rowText= paragraphs[indx].text
+
+        if self._stripParagraphs:
+          isRowEmpty= (0==len(rowText.strip()))
+          if (not hasFoundNonEmptyRow) and isRowEmpty:
+            indx += 1
+            continue
+          if not isRowEmpty:
+            hasFoundNonEmptyRow= True
+
+        textRows.append(rowText)
         indx += 1
       else:
         break
 
-    return (indx, result)
+    if self._stripParagraphs:
+      while len(textRows)>0 and not textRows[-1].strip():
+        textRows.pop()
+
+    return (indx, Paragraph( textRows))
