@@ -41,8 +41,8 @@ if __name__ == "__main__":
     print(f"Metadata:{document.metadata}")
 
     document.visitSectionsDepthFirst( sectionVisitor )
-  except Exception as e:
-    log.error(f"An error occurred while reading the document: {e}")
+  except Exception as exc:
+    log.error(f"An error occurred while reading the document: {exc}")
     exit(1)
 
 

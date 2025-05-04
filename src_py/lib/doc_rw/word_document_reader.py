@@ -3,11 +3,13 @@
 # Diego Minguzzi 2025
 from .document_reader import DocumentReader
 from .word_document_profile import WordDocumentProfile
-from entities.doc import Document, Metadata, Paragraph, Section
+from entities.doc import Document, Figure, Metadata, Paragraph, Section
 
 import docx
 import logging as log
+import io
 import os
+import PIL
 import typing
 
 class WordDocumentReader(DocumentReader):
@@ -38,7 +40,8 @@ class WordDocumentReader(DocumentReader):
     parStyleName= par.style.name
 
     while indxParagraph < len(paragraphs):
-      indx = self._traverseSection( paragraphs=paragraphs,
+      indx = self._traverseSection( wordDoc=wordDoc,
+                                    paragraphs=paragraphs,
                                     indxParagraph=indxParagraph,
                                     parentSection=rootSection)
       indxParagraph= indx
@@ -47,17 +50,22 @@ class WordDocumentReader(DocumentReader):
 
   #------------------------------------------------------------------------------------------------
   def _traverseSection( self,
+                        wordDoc: docx.Document,
                         paragraphs,
                         indxParagraph: int,
                         parentSection: Section,
                         parentRank:int=0) -> int:
+    """ Traverses a section.
+        Tries to add all sections as subsections to parent, that have rank higher than parentRank.
+        Returns the index of the next paragraph to be processed.
+    """
     indx = indxParagraph
 
     par= paragraphs[indx]
     parStyleName= par.style.name
 
     if self._parStyleRank.isTextRank( parStyleName):
-      (indx, paragraph) = self._traverseParagraph( paragraphs, indx)
+      (indx, paragraph) = self._traverseParagraph( wordDoc, paragraphs, indx)
       currSection= parentSection.createSubsection( paragraph=paragraph)
 
     else:
@@ -82,7 +90,7 @@ class WordDocumentReader(DocumentReader):
           nextRank = self._parStyleRank.getRank( nextParName)
 
           if self._parStyleRank.isTextRank( nextParName):
-            (indx, paragraph) = self._traverseParagraph( paragraphs, nextIndx)
+            (indx, paragraph) = self._traverseParagraph( wordDoc, paragraphs, nextIndx)
             if indx>=len(paragraphs):
               currSection= parentSection.createSubsection( title= sectionTitle, paragraph=paragraph)
               return indx
@@ -99,7 +107,7 @@ class WordDocumentReader(DocumentReader):
 
           nextRank = self._parStyleRank.getRank( nextParName)
           if sectRank < nextRank:
-            indx = self._traverseSection(paragraphs, nextIndx, currSection, sectRank)
+            indx = self._traverseSection( wordDoc, paragraphs, nextIndx, currSection, sectRank)
           elif nextRank <= parentRank:
             return nextIndx
           else:
@@ -109,18 +117,23 @@ class WordDocumentReader(DocumentReader):
 
   #------------------------------------------------------------------------------------------------
   def _traverseParagraph(self,
+                         wordDoc: docx.Document,
                          paragraphs,
                          indxParagraph: int) -> typing.Tuple[int, Paragraph]:
+    """ Traverses a paragraph.
+        Stops when it finds a header item.
+        Returns the index of non paragraph item and the paragraph object."""
     indx= indxParagraph
     textRows= list()
+    allFigures= list()
 
     hasFoundNonEmptyRow= False
 
     while indx < len(paragraphs):
       parStyleName= paragraphs[indx].style.name
-
+      paragraph = paragraphs[indx]
       if self._parStyleRank.isTextRank( parStyleName):
-        rowText= paragraphs[indx].text
+        rowText= paragraph.text
 
         if self._stripParagraphs:
           isRowEmpty= (0==len(rowText.strip()))
@@ -131,6 +144,11 @@ class WordDocumentReader(DocumentReader):
             hasFoundNonEmptyRow= True
 
         textRows.append(rowText)
+
+        figures= self._retrieveFigures( wordDoc, paragraph)
+        if len(figures)>0:
+          allFigures.extend( figures)
+
         indx += 1
       else:
         break
@@ -139,4 +157,32 @@ class WordDocumentReader(DocumentReader):
       while len(textRows)>0 and not textRows[-1].strip():
         textRows.pop()
 
-    return (indx, Paragraph( textRows))
+    log.debug(f'Retrieved num figures: {len(allFigures)}')
+    return (indx, Paragraph( text=textRows, figures=allFigures))
+
+  #--------------------------------------------------------------------------------------------------
+  def _retrieveFigures(self,
+                      wordDoc,
+                      paragraph) -> typing.List[Figure]:
+    figures= list()
+
+    for run in paragraph.runs:
+      # Check if the run contains an inline shape (potential picture)
+      if run._element.xpath('.//w:drawing'):
+          log.debug('Figure detected in this paragraph.')
+
+          for drawing in run._element.xpath('.//w:drawing'):
+
+            # Extract the image data from the drawing element
+            blip_elements = drawing.xpath('.//a:blip')
+            for blip in blip_elements:
+              embed = blip.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+              if embed:
+                # Access the image part from the document
+                image_part = wordDoc.part.related_parts[embed]
+                image_data = image_part.blob
+
+                image = PIL.Image.open( io.BytesIO(image_data))
+                figures.append( Figure( image=image))
+
+    return figures
