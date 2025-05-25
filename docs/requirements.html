@@ -10,14 +10,11 @@
 
 <ul>
 <li>User Log in</li>
-<li>Prompt Library
-    <ul>
-    <li>The user can insert a new prompt</li>
-    <Li>The user can edit an existing prompt: a previously submitted prompt</li>
-    <li>The user can remove a previously submitted prompt</li>
-    <li>The user can run again an old prompt (maybe the system now has different data).</li>
-    </ul>
+
+<li>Topics: the user can add, rename and delete topics<br>
+    A generic, default topic exists
   </li>
+
 <li>Documents: the user can upload a txt, pdf, or chm document; the user can also upload an image, that is then scanned.
     <ul>
     <li>Each document is related to a topic</li>
@@ -46,17 +43,35 @@
     </ul>
 
   </li>
-<li>Topics: the user can add, rename and delete topics<br>
-    A default topic exists
-  </li>
+
 <li>Language support: English and Italian, both related to UI and prompts</li>
+
+<li>Prompt Library
+    <ul>
+    <li>The user can insert a new prompt</li>
+    <Li>The user can edit an existing prompt: a previously submitted prompt</li>
+    <li>The user can remove a previously submitted prompt</li>
+    <li>The user can run again an old prompt (maybe the system now has different data).</li>
+    </ul>
+  </li>
 
 <li>Log
     <ul>
     <li>Severity filter</li>
     </ul>
   </li>
+
+
+
 </ul>
+
+
+
+
+
+
+
+
 
 <hr>
 
@@ -220,6 +235,45 @@
 
 
 <hr>
+
+storage
+
+EmbedderType
+
+Embedder
+  create()
+
+  embeddingSize() -> int
+
+  embedDocument( str )
+  embedDocuments( str )
+
+  asynchEmbedDocuments() -> list[list[number]]
+
+
+
+
+VectorStorage()
+  static createAsLocal( filepath, mode= overwriteIfExists, openIfExists, Embedder) -> VectorStorage
+  static createAsClient( host: str, port: int, Embedder) -> VectorStorage
+
+  DocumentCollection= collection( name:str, mode= overwriteIfExists, openIfExists)
+
+  AsynchDocumentCollection= asynchCollection( name:str, mode= overwriteIfExists, openIfExists)
+
+Document: str
+
+Metadata: dict
+Id : str
+
+class DocumentCollection()
+  insert() -> Id
+  delete( id)
+  queryById( id ) -> Document
+  query( Document, numResults, metadataFilter: Metadata )
+  numDocuments()
+
+
 
 
 </body>
