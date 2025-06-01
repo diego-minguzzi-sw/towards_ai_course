@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Diego Minguzzi 2025
 
-#  https://qdrant.github.io/fastembed/Getting%20Started/#quick-start
+#
 # https://qdrant.github.io/fastembed/Getting%20Started/#quick-start
 
 import asyncio

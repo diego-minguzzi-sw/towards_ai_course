@@ -8,4 +8,4 @@ class DocumentReader:
 
   @abc.abstractmethod
   def readDocument(self, filepath: str) -> Document:
-    pass
+    raise NotImplementedError()

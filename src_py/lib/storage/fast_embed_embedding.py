@@ -15,16 +15,18 @@ class FastEmbedEmbedder( storage.Embedder):
     if not type(modelId) is str:
       raise TypeError('modelId should be a string or None')
     else:
+      self._modelId= None
 
       for model in fe.TextEmbedding.list_supported_models():
         id, dim = model['model'], model['dim']
-        if id == modelId:
+        log.debug(f'modelId:\"{id}\", size:{dim}')
+        if str(id) == str(modelId):
           self._embeddingSize= int( dim)
           self._modelId= id
           log.info(f'Found modelId:{self._modelId} embedding size:{self._embeddingSize}')
 
-        if (self._modelId is None) or (self._embeddingSize is None):
-          raise ValueError(f'Model {modelId} not supported.')
+      if self._modelId is None:
+        raise ValueError(f'Model {modelId} not supported.')
 
       self._textEmbedding= fe.TextEmbedding( self._modelId)
 
@@ -43,6 +45,22 @@ class FastEmbedEmbedder( storage.Embedder):
     return self._embeddingSize
 
 if __name__ == "__main__":
+  #------------------------------------------------------------------------------------------------
+  def testModel( embedder, numIterations: int, text: str):
+    embeddingSize= embedder.embeddingSize()
+    print(f'Embedding size:{embeddingSize}')
+
+    start_time = time.time()
+    numIterations= 10
+    for _ in range(numIterations):
+      embedding = embedder.embedDocument(text)
+      assert embeddingSize == len( embedding)
+    end_time = time.time()
+
+    average_time = (end_time - start_time) / numIterations
+    print(f'\n{embedder.modelId()} {numIterations} iterations. Average time for embedding: {average_time:.6f} seconds')
+
+  #------------------------------------------------------------------------------------------------
   def main():
     text = (
       "Artificial intelligence (AI) is a branch of computer science that aims to create machines "
@@ -60,31 +78,17 @@ if __name__ == "__main__":
       "AI holds immense promise for improving efficiency, enhancing decision-making, and solving complex problems "
       "across various industries."
     )
+    #print(f'Text to embed: {text}')
 
-    print(f'Text to embed: {text}')
-    supportedModels = fe.TextEmbedding.list_supported_models()
-    for model in supportedModels:
-      model, dim, description = model['model'], model['dim'], model['description'][:80]
+    for model in fe.TextEmbedding.list_supported_models():
+      model, dim, description = model['model'], model['dim'], model['description'][:100]
       print(f'{model[:40]:<40}, {dim:>4}, {description}')
 
+    embedder= FastEmbedEmbedder(modelId='nomic-ai/nomic-embed-text-v1.5')
+    testModel( embedder, numIterations=10, text= text)
+
     embedder= FastEmbedEmbedder()
-    embeddingSize= embedder.embeddingSize()
-    print(f'Embedding size:{embeddingSize}')
-
-    embedding = embedder.embedDocument( text)
-    start_time = time.time()
-    numIterations= 10
-    for _ in range(numIterations):
-      embedding = embedder.embedDocument(text)
-    end_time = time.time()
-
-    average_time = (end_time - start_time) / numIterations
-    print(f'Average time for embedding: {average_time:.6f} seconds')
-
-    print(f'Embedding size:{len(embedding)}')
-    assert embeddingSize == len( embedding)
-
-    print(f'Embedding:{embedding[:10]}')
+    testModel( embedder, numIterations=10, text= text)
 
   log.basicConfig(level=log.INFO, format='%(asctime)s %(levelname)s %(funcName)s:%(lineno)d: %(message)s - ')
   main()
