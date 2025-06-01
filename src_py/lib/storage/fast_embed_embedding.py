@@ -78,18 +78,21 @@ if __name__ == "__main__":
       "AI holds immense promise for improving efficiency, enhancing decision-making, and solving complex problems "
       "across various industries."
     )
-    #print(f'Text to embed: {text}')
+    print(f'Text to embed: {text}\n')
 
     for model in fe.TextEmbedding.list_supported_models():
       model, dim, description = model['model'], model['dim'], model['description'][:100]
       print(f'{model[:40]:<40}, {dim:>4}, {description}')
 
-    embedder= FastEmbedEmbedder(modelId='nomic-ai/nomic-embed-text-v1.5')
+    embedder= FastEmbedEmbedder( modelId='nomic-ai/nomic-embed-text-v1.5')
     testModel( embedder, numIterations=10, text= text)
 
-    embedder= FastEmbedEmbedder()
+    embedder= FastEmbedEmbedder( modelId='BAAI/bge-base-en')
     testModel( embedder, numIterations=10, text= text)
 
-  log.basicConfig(level=log.INFO, format='%(asctime)s %(levelname)s %(funcName)s:%(lineno)d: %(message)s - ')
+    # embedder= FastEmbedEmbedder( modelId='jinaai/jina-embeddings-v3')
+    # testModel( embedder, numIterations=10, text= text)
+
+  log.basicConfig(level=log.ERROR, format='%(asctime)s %(levelname)s %(funcName)s:%(lineno)d: %(message)s - ')
   main()
 

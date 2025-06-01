@@ -8,8 +8,6 @@ import logging as log
 import unittest
 from collections import namedtuple
 
-
-
 #---------------------------------------------------------------------------------------------------
 class TestParagraphStyle(unittest.TestCase):
 
