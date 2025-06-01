@@ -15,8 +15,13 @@ class Figure:
     self._image= image
 
   @property
-  def image( self):
+  def image( self) -> Image.Image:
     return self._image
+
+  @property
+  def imageSize( self) -> tuple[int, int]:
+    """ Returns the size of the image as a tuple (width, height)."""
+    return self._image.size
 
 #--------------------------------------------------------------------------------------------------
 if __name__ == "__main__":

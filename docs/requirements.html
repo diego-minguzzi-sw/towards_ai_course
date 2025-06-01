@@ -20,7 +20,7 @@
     <li>Each document is related to a topic</li>
     <li>Upon document upload, the user can check the option of generating a document summary, <br>
         that is then added as a metadata</li>
-    <li>Upon upload, the system proposes a title of the document, that the user can edit or accept</li>
+    <li>Upon upload, the system proposes a title of the document, that the user can then edit or accept</li>
     <li>The user can later remove a document, doing so it removes the document, the metadata and all the chunks</li>
     <li>The system tries to extract tag words from each document: keywords to understand the subject of the document</li>
     <li>There is a page with document status: for each document it shows the processing status:
@@ -122,7 +122,6 @@
 
 <li>(_) Lang Graph</li>
 <li>(_) OCR service</li>
-<li>(_) Py PDF</li>
 <li>(_) Web scraper</li>
 <li>(_) </li>
 <li>(_) </li>
@@ -245,10 +244,12 @@ Embedder
 
   embeddingSize() -> int
 
-  embedDocument( str )
+  embedDocument( str ) -> list[ numbers]
   embedDocuments( str )
 
-  asynchEmbedDocuments() -> list[list[number]]
+EmbeddedFactory
+
+
 
 
 

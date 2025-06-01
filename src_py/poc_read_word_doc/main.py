@@ -25,6 +25,13 @@ if __name__ == "__main__":
     indent= '..' * depth
     print(f'{indent}Section: \"{section.title}\"')
     print(f'{indent}Text:    {section.paragraphAllText()[:100]}')
+    paragraph= section.paragraph
+    if paragraph.hasFigures:
+      print(f'{indent}Figures: {paragraph.numFigures}')
+      for indx in range(paragraph.numFigures):
+        figure = paragraph.figure(indx)
+        width, height = figure.imageSize
+        print(f'{indent}Figure:{indx}: {width}x{height}px')
 
   parser = argparse.ArgumentParser(description="Reads a Microsoft Word document docx file.")
   parser.add_argument("filepath", type=str, help="Path to the Word document to be read.")

@@ -72,3 +72,9 @@ class Paragraph:
   #-----------------------------------------------------------------------------------------------
   def figures(self) -> List[Figure]:
     return self._figures
+
+  #-----------------------------------------------------------------------------------------------
+  def figure(self, index) -> Figure:
+    if (index < 0) or (index >= len(self._figures)):
+      raise IndexError(f'Index out of range. Got:{index} Num.figures:{self.numFigures}')
+    return self._figures[index]
