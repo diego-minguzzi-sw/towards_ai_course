@@ -1,6 +1,7 @@
 chromadb==0.6.3
 flet==0.26.0
 flet-desktop-light==0.26.0
+google-genai==1.12.1
 google-generativeai==0.8.3
 gradio==5.23.0
 html2text==2024.2.26

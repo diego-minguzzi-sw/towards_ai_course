@@ -6,11 +6,21 @@ import abc
 Embedding = list[ float]
 
 class Embedder:
+
   @abc.abstractmethod
   def embedDocument(self, doc: str) -> Embedding:
     raise NotImplementedError()
 
+  @abc.abstractmethod
   def embedDocuments(self, docs: list[str]) -> list[Embedding]:
+    raise NotImplementedError()
+
+  @abc.abstractmethod
+  def embedQuery(self, doc: str) -> Embedding:
+    raise NotImplementedError()
+
+  @abc.abstractmethod
+  def embedQueries(self, docs: list[str]) -> list[Embedding]:
     raise NotImplementedError()
 
   def modelId( self) -> str:

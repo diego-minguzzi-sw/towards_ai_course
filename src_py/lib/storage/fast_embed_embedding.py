@@ -7,10 +7,10 @@ import fastembed as fe
 import logging as log
 import time
 
-# Check
-# https://qdrant.github.io/fastembed/Getting%20Started/#quick-start
-
 class FastEmbedEmbedder( storage.Embedder):
+  """ Embedder based on the fastembed library.
+      https://qdrant.github.io/fastembed/Getting%20Started/#quick-start
+  """
   def __init__( self, modelId= 'BAAI/bge-base-en'):
     if not type(modelId) is str:
       raise TypeError('modelId should be a string or None')
@@ -38,6 +38,12 @@ class FastEmbedEmbedder( storage.Embedder):
     embeddingsGenerator = self._textEmbedding.embed( docs)
     return list(embeddingsGenerator)
 
+  def embedQuery(self, doc: str) -> storage.Embedding:
+    return self.embedDocument(doc)
+
+  def embedQueries(self, docs: list[str]) -> list[storage.Embedding]:
+    return self.embedDocuments( docs)
+
   def modelId( self) -> str:
     return self._modelId
 
@@ -51,7 +57,6 @@ if __name__ == "__main__":
     print(f'Embedding size:{embeddingSize}')
 
     start_time = time.time()
-    numIterations= 10
     for _ in range(numIterations):
       embedding = embedder.embedDocument(text)
       assert embeddingSize == len( embedding)
