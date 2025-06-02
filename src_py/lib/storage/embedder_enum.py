@@ -10,6 +10,7 @@ class EmbedderEnum(Enum):
   FastEmbedBase = ('BAAI/bge-base-en',)
   FastEmbedNomicAI = ('nomic-ai/nomic-embed-text-v1.5',)
   FastEmbedDefault = FastEmbedNomicAI
+  GoogleEmbed = ('text-embedding-004',)
 
   def __init__(self, modelId):
     self._modelId= modelId

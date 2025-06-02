@@ -5,6 +5,7 @@
 from .embedder import Embedder
 from .embedder_enum import EmbedderEnum
 from .fast_embed_embedding import FastEmbedEmbedder
+from .google_genai_embedding import GoogleGenAIEmbedder
 
 import logging as log
 
@@ -21,6 +22,9 @@ class EmbedderFactory:
 
       case EmbedderEnum.FastEmbedNomicAI:
         return FastEmbedEmbedder( embedder.modelId)
+
+      case EmbedderEnum.GoogleEmbed:
+        return GoogleGenAIEmbedder( embedder.modelId)
 
     raise ValueError(f"Unsupported embedder: {embedder.modelId}")
 

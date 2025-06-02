@@ -10,23 +10,39 @@ title Tech KB Doc
 
 package storage
 {
+enum EmbedderEnum {
+  FastEmbedBase
+  FastEmbedNomicAI
+  FastEmbedDefault
+  GoogleEmbedding
+}
 
 class Embedding
 note right of Embedding
   list[ numbers]
 end note
 
+class Embeddings
+Embeddings *-- Embedding
+
 abstract class Embedder
 {
   {abstract} int embeddingSize()
-  {abstract} Embedding embedDocument( [str] )
+  {abstract} Embedding  embedDocument( str )
+  {abstract} Embeddings embedDocuments( [str] )
+  {abstract} Embedding  embedQuery( str )
+  {abstract} Embeddings embedQueries( [str] )
 }
+
+Embedder <|-- FastEmbedEmbedder
+Embedder <|-- GoogleGenAIEmbedder
 
 class EmbedderFactory
 {
-  {static} createEmbedder()
+  {static} createEmbedder( EmbedderEnum)
 }
 
+EmbedderFactory -- EmbedderEnum
 
 }
 ' package storage

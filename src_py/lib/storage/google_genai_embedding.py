@@ -5,13 +5,18 @@ import storage
 
 from google import genai
 from google.genai import types
+
+import exc
+import json
 import logging as log
+import pprint
 import time
 
 #--------------------------------------------------------------------------------------------------
 class GoogleGenAIEmbedder( storage.Embedder):
   QUERY_TASK = 'RETRIEVAL_QUERY'
   STORE_TASK = 'RETRIEVAL_DOCUMENT'
+  ERROR_CODE_QUOTA_EXCEEDED = 429
 
   #------------------------------------------------------------------------------------------------
   def __init__( self, modelId= 'text-embedding-004'):
@@ -59,30 +64,49 @@ class GoogleGenAIEmbedder( storage.Embedder):
     if taskType not in self._supportedTasks:
       raise ValueError(f'Task:\'{taskType}\' not supported.')
 
-    result = self._client.models.embed_content(
-        model=self._modelId,
-        contents=text,
-        config=types.EmbedContentConfig(task_type=taskType) )
-    embeddings= result.embeddings[0].values
-    log.debug(f'Embeddings type:{type(embeddings)}, Item type:{type(embeddings[0])} length:{len(embeddings)}')
-    return embeddings
+    try:
+      result = self._client.models.embed_content(
+          model=self._modelId,
+          contents=text,
+          config=types.EmbedContentConfig(task_type=taskType) )
+      embeddings= result.embeddings[0].values
+      log.debug(f'Embeddings type:{type(embeddings)}, Item type:{type(embeddings[0])} length:{len(embeddings)}')
+      return embeddings
+
+    except genai.errors.ClientError as e:
+      excMessage= e.message
+      if self.ERROR_CODE_QUOTA_EXCEEDED == e.code:
+        log.error('GenAI Client error: exceeded Google usage limit.')
+        raise exc.ExceededCapacityException(excMessage) from e
+
+      raise RuntimeError(f'GenAI Client error: {excMessage}') from e
 
   #------------------------------------------------------------------------------------------------
   def _executeBatchRequest( self, texts: list[str], taskType:str) -> list[storage.Embedding]:
     if taskType not in self._supportedTasks:
       raise ValueError(f'Task:\'{taskType}\' not supported.')
 
-    result = self._client.models.embed_content(
-        model=self._modelId,
-        contents=texts,
-        config=types.EmbedContentConfig(task_type=taskType) )
-    embeddingsResult= list()
-    for embeddingsItem in result.embeddings:
-      embeddingsValues = embeddingsItem.values
-      log.debug(f'Embeddings type:{type(embeddingsValues)}, item type:{type(embeddingsValues[0])} length:{len(embeddingsValues)}')
-      embeddingsResult.append(embeddingsValues)
+    try:
+      result = self._client.models.embed_content(
+          model=self._modelId,
+          contents=texts,
+          config=types.EmbedContentConfig(task_type=taskType) )
+      embeddingsResult= list()
+      for embeddingsItem in result.embeddings:
+        embeddingsValues = embeddingsItem.values
+        log.debug(f'Embeddings type:{type(embeddingsValues)}, item type:{type(embeddingsValues[0])} length:{len(embeddingsValues)}')
+        embeddingsResult.append(embeddingsValues)
+      return embeddingsResult
 
-    return embeddingsResult
+    except genai.errors.ClientError as e:
+      excMessage= e.message
+      if self.ERROR_CODE_QUOTA_EXCEEDED == e.code:
+        log.error('GenAI Client error: exceeded Google usage limit.')
+        raise exc.ExceededCapacityException(excMessage) from e
+
+      raise RuntimeError(f'GenAI Client error: {excMessage}') from e
+
+#--------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
   #------------------------------------------------------------------------------------------------
@@ -136,9 +160,18 @@ if __name__ == "__main__":
     embedder= GoogleGenAIEmbedder()
     assert embedder is not None
 
-    testModel( embedder, numIterations=5, text=text)
-    testModelOnBatch( embedder, batchSize=5, text=text)
 
-  log.basicConfig(level=log.ERROR, format='%(asctime)s %(levelname)s %(funcName)s:%(lineno)d: %(message)s - ')
+    try:
+      testModel( embedder, numIterations=1000, text=text)
+
+      testModelOnBatch( embedder, batchSize=5, text=text)
+
+    except exc.ExceededCapacityException as e:
+      log.error(f'ExceededCapacityException caught:\n{e}')
+    except Exception as e:
+      log.error(f'Exception caught:\n{e}')
+
+
+  log.basicConfig(level=log.INFO, format='%(asctime)s %(levelname)s %(funcName)s:%(lineno)d: %(message)s - ')
   main()
 

@@ -6,11 +6,9 @@ from storage import Embedder, EmbedderEnum, EmbedderFactory
 import logging as log
 import unittest
 
-#---------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
 class TestEmbedder(unittest.TestCase):
-
-  def testEmbedder(self):
-    text = (
+  text = (
       "Artificial intelligence (AI) is a branch of computer science that aims to create machines "
       "that can perform tasks that typically require human intelligence. These tasks include "
       "learning, reasoning, problem-solving, perception, and language understanding. AI has "
@@ -24,14 +22,26 @@ class TestEmbedder(unittest.TestCase):
       "physical tasks. As AI continues to evolve, it raises important ethical and societal questions, such as "
       "privacy concerns, job displacement, and the potential for bias in decision-making. Despite these challenges, "
       "AI holds immense promise for improving efficiency, enhancing decision-making, and solving complex problems "
-      "across various industries."
-    )
+      "across various industries.")
+
+  #------------------------------------------------------------------------------------------------
+  def testDefaultEmbedder(self):
 
     embedder = EmbedderFactory.createEmbedder()
     embeddingSize= embedder.embeddingSize()
-    log.info(f'Embedding size:{embeddingSize}')
+    log.info(f'Model Id:{embedder.modelId} Embedding size:{embeddingSize}')
 
-    embedding = embedder.embedDocument(text)
+    embedding = embedder.embedDocument( self.text)
+    self.assertEqual( len( embedding), embeddingSize)
+
+  #------------------------------------------------------------------------------------------------
+  def testGoogleEmbedder(self):
+
+    embedder = EmbedderFactory.createEmbedder( EmbedderEnum.GoogleEmbed)
+    embeddingSize= embedder.embeddingSize()
+    log.info(f'Model Id:{embedder.modelId} Embedding size:{embeddingSize}')
+
+    embedding = embedder.embedDocument( self.text)
     self.assertEqual( len( embedding), embeddingSize)
 
 
